@@ -62,13 +62,13 @@ class Algorithm:
 
             closed_list.add(current_node)
 
-            for neighbor in cls.getNeighbors(current_node):
+            for neighbor in cls.__getNeighbors(current_node):
                 if neighbor in closed_list:
                     continue
 
                 new_cost = current_node.cost + 1
                 if neighbor not in open_list:
-                    heapq.heappush(open_list, (new_cost + cls.estimatedCost(neighbor, goal), neighbor))
+                    heapq.heappush(open_list, (new_cost + cls.__estimatedCost(neighbor, goal), neighbor))
                 elif new_cost < neighbor.cost:
                     neighbor.cost = new_cost
                     neighbor.parent = current_node
