@@ -52,23 +52,33 @@ class Algorithm:
         while open_list:
             current_cost, current_node = heapq.heappop(open_list)
 
+            # if the current node is the goal node, register the path
             if current_node == goal:
                 # Goal reached, construct and return the path
                 path = []
+                # builds the path by following the parent, then the grandparent and so forth
                 while current_node:
                     path.append(current_node.position)
                     current_node = current_node.parent
+                # the semantics is array[start : end : step], but array[::-1] reverses the array
                 return path[::-1]
 
+            # no matter what, the current node goes to the closed list
             closed_list.add(current_node)
 
+            # Let's check the neighbours
             for neighbor in cls.__getNeighbors(current_node):
+                # Skipping neighbours that were already visited
                 if neighbor in closed_list:
                     continue
-
+                # Not the goal yet, thus the cost increase by 1
                 new_cost = current_node.cost + 1
+                # Were the paths through this neighbor investigated? If not, it goes into the open list
                 if neighbor not in open_list:
                     heapq.heappush(open_list, (new_cost + cls.__estimatedCost(neighbor, goal), neighbor))
+                # OK, paths investigated: Is this path, through this neighbor, cheaper?
                 elif new_cost < neighbor.cost:
+                    # Actually, going through this neighbor is cheaper than estimated
                     neighbor.cost = new_cost
+                    # Let's consider this neighbor to build the path
                     neighbor.parent = current_node
