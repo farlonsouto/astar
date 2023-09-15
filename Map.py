@@ -69,7 +69,7 @@ class Map_Obj():
                          header=None)  # ,error_bad_lines=False)
         # Convert pandas dataframe to numpy array
         data = df.values
-        # Convert numpy array to string to make it more human readable
+        # Convert numpy array to string to make it more human-readable
         data_str = data.astype(str)
         # Replace numeric values with more human readable symbols
         data_str[data_str == '-1'] = ' # '
@@ -308,7 +308,7 @@ class Map_Obj():
         Parameters
         ----------
         themap : np.ndarray or str, optional
-            The map to show. By default uses the string map
+            The map to show. By default, uses the string map
         """
         # If a map is provided, set the goal and start positions
         if themap is not None:
