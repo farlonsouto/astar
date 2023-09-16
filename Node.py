@@ -19,3 +19,5 @@ class Node:
         self.isStart = isStart
         self.isGoal = isGoal
 
+    def __lt__(self, other):
+        return self.cost < other.cost
