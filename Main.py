@@ -12,7 +12,7 @@ for i in range(len(numMap)):
     for j in range(len(numMap[i])):
         value = stringMap[i][j]
         num = numMap[i][j]
-        nodeArray.append(Node((i, j), None, num, num > 0, value == 'S', value == 'G'))
+        nodeArray.append(Node((i, j), None, num, num > 0, value == ' S ', value == ' G '))
     nodeMap.append(nodeArray)
 
 startPos = bothMaps.get_start_pos()
