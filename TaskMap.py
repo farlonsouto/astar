@@ -9,7 +9,7 @@ np.set_printoptions(threshold=np.inf, linewidth=300)
 # Extended and documented by Xavier Sánchez-Díaz
 
 
-class Map_Obj():
+class TaskMap:
     """
     A map object helper class.
 
