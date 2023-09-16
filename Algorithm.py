@@ -19,7 +19,7 @@ class Algorithm:
     # -----------------------------------------------------------------------------------------------------------
 
     @classmethod
-    def __getNeighbors(cls, node) -> [Node]:
+    def __getNeighbors(cls, node, nodeMap: list[list[Node]]) -> [Node]:
         """ Looks around (right, left, up and down). Finds the adjacent nodes.
             Args:
                 node: An instance of Node representing a node in the graph.
@@ -32,14 +32,15 @@ class Algorithm:
         # Add adjacent nodes (up, down, left, right)
         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
             new_x, new_y = x + dx, y + dy
-            neighbors.append(Node((new_x, new_y), node, node.cost + 1))
+            if new_x in range(len(nodeMap)) and new_y in range(len(nodeMap[0])):
+                neighbors.append(nodeMap[new_x][new_y])
 
         return neighbors
 
     # -----------------------------------------------------------------------------------------------------------
 
     @classmethod
-    def findPath(cls, start, goal):
+    def findPath(cls, start, goal, nodeMap: list[list[Node]]):
         """ A* algorithm straightforward implementation """
         open_list = []
         closed_list = set()
@@ -64,7 +65,7 @@ class Algorithm:
             closed_list.add(current_node)
 
             # Let's check the neighbours
-            for neighbor in cls.__getNeighbors(current_node):
+            for neighbor in cls.__getNeighbors(current_node, nodeMap):
                 # Skipping neighbours that were already visited
                 if neighbor in closed_list:
                     continue

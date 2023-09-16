@@ -15,5 +15,12 @@ for i in range(len(numMap)):
         nodeArray.append(Node((i, j), None, num, num > 0, value == 'S', value == 'G'))
     nodeMap.append(nodeArray)
 
+startPos = bothMaps.get_start_pos()
+goalPos = bothMaps.get_goal_pos()
+
+startNode = nodeMap[startPos[0]][startPos[1]]
+goalNode = nodeMap[goalPos[0]][goalPos[1]]
+
+path = Algorithm.findPath(startNode, goalNode, nodeMap)
 
 
