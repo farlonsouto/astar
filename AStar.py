@@ -1,4 +1,5 @@
 import heapq
+import time
 
 from Node import Node
 from TaskMap import *
@@ -8,7 +9,8 @@ class AStar:
     """
     TDT4136 - Introduction to Artificial Intelligence - NTNU - Autumn 2023
     Assignment 1: Implement the A* Algorithm
-    """
+
+    Reference: https://brilliant.org/wiki/a-star-search/ """
 
     def __init__(self, mapManager: TaskMap):
         """ Creates a new instance of AStar
@@ -18,14 +20,14 @@ class AStar:
         self.mapManager = mapManager
         bothMaps = mapManager.get_maps()
         numMap = bothMaps[0]
-        stringMap = bothMaps[1]
+        self.stringMap = bothMaps[1]
         nodeMap_Aux = []
 
         # loads both the numeric and the string array data into the Node map (2D array)
         for i in range(len(numMap)):
             nodeArray = []
             for j in range(len(numMap[i])):
-                value = stringMap[i][j]
+                value = self.stringMap[i][j]
                 num = numMap[i][j]
                 nodeArray.append(Node((i, j), None, num, num > 0, value == ' S ', value == ' G '))
             nodeMap_Aux.append(nodeArray)
@@ -42,12 +44,13 @@ class AStar:
 
     @classmethod
     def __estimatedCost(cls, origin, destination) -> int:
-        """ Heuristic function. Estimates the cost of going from an origin node to a destination node.
+        """ Euclidian heuristic function. Estimates the cost of going from an origin node to a destination node in a
+        straight line.
             Args:
-                origin: The current node in the graph.
-                destination: The node in the graph to be reached, the goal.
-            Returns:
-                A numerical value representing the cost of moving from the origin node to the destination node.
+                origin: The current node in the graph. destination: The node in the graph to be reached,
+                the goal.
+            Returns: A numerical value representing the cost of moving from the origin node to the destination
+                node.
         """
         x1, y1 = origin.position
         x2, y2 = destination.position
@@ -77,44 +80,62 @@ class AStar:
 
     # -----------------------------------------------------------------------------------------------------------
 
-    def findPath(self) -> list[Node]:
-        """ A* algorithm straightforward implementation """
-        open_list = []
-        closed_list = set()
+    def path(self) -> list[Node]:
+        """ register the path """
+        print("Path to Goal found!")
+        # Goal reached, construct and return the path
+        path = []
+        # builds the path by following the parent, then the grandparent and so forth
+        node = self.goalNode
+        while node:
+            # geta a grey path in the map
+            self.stringMap[node.position[0]][node.position[1]] = " , "
+            # append the node to the path
+            path.append(node)
+            # gets the current node's parent
+            node = node.parent
+        # the semantics is array[start : end : step], but array[::-1] reverses the array
+        return path[::-1]
 
-        heapq.heappush(open_list, (self.startNode.cost, self.startNode))
+    # -----------------------------------------------------------------------------------------------------------
 
-        while open_list:
-            current_cost, current_node = heapq.heappop(open_list)
+    def aStartInformedSearch(self) -> list[Node]:
+        openList = []
+        closedList = []
+        heapq.heappush(openList, (self.startNode.cost, self.startNode))
 
-            # if the current node is the goal node, register the path
-            if current_node == self.goalNode:
-                print("Path to Goal found!")
-                # Goal reached, construct and return the path
-                path = []
-                # builds the path by following the parent, then the grandparent and so forth
-                while current_node:
-                    path.append(current_node)
-                    current_node = current_node.parent
-                # the semantics is array[start : end : step], but array[::-1] reverses the array
-                return path[::-1]
+        print("startNode: " + str(self.startNode.position))
+        print("goalNode: " + str(self.goalNode.position))
 
-            # no matter what, the current node goes to the closed list
-            closed_list.add(current_node)
+        while True:
+            currentNodeCost, currentNode = heapq.heappop(openList)
+            # Let's place current node goes into the closed list, so we know it was already visited:
+            heapq.heappush(closedList, currentNode)
+            # let's look around in the neighborhood to find the path:
+            neighborhood = self.__getNeighbors(currentNode)
+            for neighbor in neighborhood:
 
-            # Let's check the neighbours
-            for neighbor in self.__getNeighbors(current_node):
-                # Skipping neighbours that were already visited
-                if neighbor in closed_list:
-                    continue
-                # Not the goal yet, thus the cost increase by 1
-                new_cost = current_node.cost + 1
-                # Were the paths through this neighbor investigated? If not, it goes into the open list
-                if neighbor not in open_list:
-                    heapq.heappush(open_list, (new_cost + self.__estimatedCost(neighbor, self.goalNode), neighbor))
-                # OK, paths investigated: Is this path, through this neighbor, cheaper?
-                elif new_cost < neighbor.cost:
-                    # Actually, going through this neighbor is cheaper than estimated
-                    neighbor.cost = new_cost
-                    # Let's consider this neighbor to build the path
-                    neighbor.parent = current_node
+                # Goal node just around?
+                if neighbor is self.goalNode:
+                    self.goalNode.parent = currentNode
+                    # geta a grey path in the map
+                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " , "
+                    self.mapManager.show_map()
+                    return self.path()
+
+                # cost_node_n_f(n) = cost_from_start_to_here_g(n) + cost_heuristic_from_here_to_goal_h(n)
+                neighborEstimatedCost = neighbor.cost + self.__estimatedCost(neighbor, self.goalNode)
+                currentNodeCost = currentNodeCost + self.__estimatedCost(currentNode, self.goalNode)
+                if neighborEstimatedCost < currentNodeCost and neighbor in closedList:
+                    neighbor.cost = neighborEstimatedCost
+                    neighbor.parent = currentNode
+                    # gets a grey path in the map
+                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " , "
+                elif currentNodeCost < neighborEstimatedCost and neighbor in list(map(lambda item: item[1], openList)):
+                    neighbor.cost = neighborEstimatedCost
+                    currentNode.parent = neighbor
+                    # gets a grey path in the map
+                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " , "
+                else:
+                    heapq.heappush(openList, (neighborEstimatedCost, neighbor))
+

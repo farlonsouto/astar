@@ -5,6 +5,7 @@ from typing import Union
 
 np.set_printoptions(threshold=np.inf, linewidth=300)
 
+
 # Original code by Håkon Måløy
 # Extended and documented by Xavier Sánchez-Díaz
 
@@ -31,6 +32,7 @@ class TaskMap:
     get_maps()
         Get integer and string maps
     """
+
     def __init__(self, task: int = 1) -> None:
         """Instantiate a map object for task number `task`.
 
@@ -46,6 +48,8 @@ class TaskMap:
         self.set_cell_value(self.start_pos, ' S ')
         self.set_cell_value(self.goal_pos, ' G ')
         self.tick_counter = 0
+        # create canvas
+        self.scale = 20
 
     def read_map(self, path: str) -> tuple[np.ndarray, str]:
         """
@@ -80,7 +84,7 @@ class TaskMap:
         return data, data_str
 
     def fill_critical_positions(self, task: int) -> tuple[list[int], list[int],
-                                                          list[int], str]:
+    list[int], str]:
         """
         Fill the important positions for the current task. Given the
         task, the path to the correct map is set, and the start, goal
@@ -302,29 +306,31 @@ class TaskMap:
         else:
             themap[goal_pos[0]][goal_pos[1]] = ' G '
 
-    def show_map(self, themap: Union[np.ndarray, str] = None):
+    def show_map(self, theMap: Union[np.ndarray, str] = None):
         """Draws `themap` as an image and shows it.
 
         Parameters
         ----------
-        themap : np.ndarray or str, optional
+        theMap : np.ndarray or str, optional
             The map to show. By default, uses the string map
         """
         # If a map is provided, set the goal and start positions
-        if themap is not None:
-            self.set_start_pos_str_marker(self.start_pos, themap)
-            self.set_goal_pos_str_marker(self.goal_pos, themap)
+        if theMap is not None:
+            self.set_start_pos_str_marker(self.start_pos, theMap)
+            self.set_goal_pos_str_marker(self.goal_pos, theMap)
         # If no map is provided, use string_map
         else:
-            themap = self.str_map
+            theMap = self.str_map
 
         # Define width and height of image
-        width = themap.shape[1]
-        height = themap.shape[0]
+        width = theMap.shape[1]
+        height = theMap.shape[0]
         # Define scale of the image
-        scale = 20
+
+        # self.myCanvas = tkinter.Canvas(self.root, bg="white", height=height * self.scale, width=width * self.scale)
+
         # Create an all-yellow image
-        image = Image.new('RGB', (width * scale, height * scale),
+        image = Image.new('RGB', (width * self.scale, height * self.scale),
                           (255, 255, 0))
         # Load image
         pixels = image.load()
@@ -336,19 +342,29 @@ class TaskMap:
             ' # ': (211, 33, 45),  # redish
             ' . ': (215, 215, 215),  # whiteish
             ' , ': (166, 166, 166),  # lightgrey
-            ' : ': (96, 96, 96),   # darkgrey
-            ' ; ': (36, 36, 36),   # blackish
+            ' : ': (96, 96, 96),  # darkgrey
+            ' ; ': (36, 36, 36),  # blackish
             ' S ': (255, 0, 255),  # magenta
-            ' G ': (0, 128, 255)   # cyan
+            ' G ': (0, 128, 255)  # cyan
         }
+
+        canvas_colors = {
+            ' # ': "red",
+            ' . ': "white",
+            ' , ': "grey",
+            ' : ': "black",
+            ' ; ': "yellow",
+            ' S ': "pink",
+            ' G ': "blue"
+        }
+
         # Go through image and set pixel color for every position
         for y in range(height):
             for x in range(width):
-                if themap[y][x] not in colors:
+                if theMap[y][x] not in colors:
                     continue
-                for i in range(scale):
-                    for j in range(scale):
-                        pixels[x * scale + i,
-                               y * scale + j] = colors[themap[y][x]]
+                for i in range(self.scale):
+                    for j in range(self.scale):
+                        pixels[x * self.scale + i, y * self.scale + j] = colors[theMap[y][x]]
         # Show image
         image.show()
