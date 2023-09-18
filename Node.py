@@ -15,6 +15,7 @@ class Node:
         self.position = position
         self.parent = parent
         self.cost = cost
+        self.weight = cost  # cannot be changed
         self.isWalkable = walkable
         self.isStart = isStart
         self.isGoal = isGoal

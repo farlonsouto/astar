@@ -10,7 +10,7 @@ class AStar:
     TDT4136 - Introduction to Artificial Intelligence - NTNU - Autumn 2023
     Assignment 1: Implement the A* Algorithm
 
-    Reference: https://brilliant.org/wiki/a-star-search/ """
+    Pseudo-Algorithm Reference: https://brilliant.org/wiki/a-star-search/ """
 
     def __init__(self, mapManager: TaskMap):
         """ Creates a new instance of AStar
@@ -44,7 +44,7 @@ class AStar:
 
     @classmethod
     def __estimatedCost(cls, origin, destination) -> int:
-        """ Euclidian heuristic function. Estimates the cost of going from an origin node to a destination node in a
+        """ Manhattan heuristic function. Estimates the cost of going from an origin node to a destination node in a
         straight line.
             Args:
                 origin: The current node in the graph. destination: The node in the graph to be reached,
@@ -99,7 +99,16 @@ class AStar:
 
     # -----------------------------------------------------------------------------------------------------------
 
-    def aStartInformedSearch(self) -> list[Node]:
+    def aStartInformedSearch(self, theClokIsTicking=False) -> list[Node]:
+        """
+        Straightforward implementation of the A* path finding algorithm. A call to this function will cause a temporary
+        image to be generated showing the calculated path.
+        Args:
+            theClokIsTicking: If set True will cause goal movement at each 4th main loop iteration. False by default.
+        returns:
+            A list of Nodes corresponding to the path from the start Node to the goal Node.
+        deprecated: Does not inform the correct list. The corresponding fix is to be released in the next version.
+        """
         openList = []
         closedList = []
         heapq.heappush(openList, (self.startNode.cost, self.startNode))
@@ -107,7 +116,13 @@ class AStar:
         print("startNode: " + str(self.startNode.position))
         print("goalNode: " + str(self.goalNode.position))
 
+        # self.mapManager.show_map()
+
         while True:
+
+            if theClokIsTicking:
+                self.mapManager.tick()
+
             currentNodeCost, currentNode = heapq.heappop(openList)
             # Let's place current node goes into the closed list, so we know it was already visited:
             heapq.heappush(closedList, currentNode)
@@ -119,7 +134,7 @@ class AStar:
                 if neighbor is self.goalNode:
                     self.goalNode.parent = currentNode
                     # geta a grey path in the map
-                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " , "
+                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " * "
                     self.mapManager.show_map()
                     return self.path()
 
@@ -130,12 +145,11 @@ class AStar:
                     neighbor.cost = neighborEstimatedCost
                     neighbor.parent = currentNode
                     # gets a grey path in the map
-                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " , "
+                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " * "
                 elif currentNodeCost < neighborEstimatedCost and neighbor in list(map(lambda item: item[1], openList)):
                     neighbor.cost = neighborEstimatedCost
                     currentNode.parent = neighbor
                     # gets a grey path in the map
-                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " , "
+                    self.stringMap[currentNode.position[0]][currentNode.position[1]] = " * "
                 else:
                     heapq.heappush(openList, (neighborEstimatedCost, neighbor))
-

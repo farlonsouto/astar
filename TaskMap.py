@@ -267,14 +267,14 @@ class TaskMap:
         return self.goal_pos
 
     def set_start_pos_str_marker(self, start_pos: list[int, int],
-                                 themap: Union[np.ndarray, str]):
+                                 theMap: Union[np.ndarray, str]):
         """Sets the start position marker at `start_pos` in `map`
 
         Parameters
         ----------
         start_pos : list[int, int]
             Position which we want to mark as the start
-        themap : np.ndarray or str
+        theMap : np.ndarray or str
             Map in which we want to change the starting position
         """
         # Attempt to set the start position on the map
@@ -284,7 +284,7 @@ class TaskMap:
                   ' is not a valid position on the current map.')
             exit()
         else:
-            themap[start_pos[0]][start_pos[1]] = ' S '
+            theMap[start_pos[0]][start_pos[1]] = ' S '
 
     def set_goal_pos_str_marker(self, goal_pos: list[int, int],
                                 themap: Union[np.ndarray, str]):
@@ -327,8 +327,6 @@ class TaskMap:
         height = theMap.shape[0]
         # Define scale of the image
 
-        # self.myCanvas = tkinter.Canvas(self.root, bg="white", height=height * self.scale, width=width * self.scale)
-
         # Create an all-yellow image
         image = Image.new('RGB', (width * self.scale, height * self.scale),
                           (255, 255, 0))
@@ -346,16 +344,6 @@ class TaskMap:
             ' ; ': (36, 36, 36),  # blackish
             ' S ': (255, 0, 255),  # magenta
             ' G ': (0, 128, 255)  # cyan
-        }
-
-        canvas_colors = {
-            ' # ': "red",
-            ' . ': "white",
-            ' , ': "grey",
-            ' : ': "black",
-            ' ; ': "yellow",
-            ' S ': "pink",
-            ' G ': "blue"
         }
 
         # Go through image and set pixel color for every position
