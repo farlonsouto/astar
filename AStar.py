@@ -44,8 +44,8 @@ class AStar:
 
     @classmethod
     def __estimatedCost(cls, origin, destination) -> int:
-        """ Manhattan heuristic function. Estimates the cost of going from an origin node to a destination node in a
-        straight line.
+        """ Manhattan heuristic function. Estimates the cost of going from an origin node to a destination node as a
+            taxi driver would, i.e. not in a straight line, but through the blocks.
             Args:
                 origin: The current node in the graph. destination: The node in the graph to be reached,
                 the goal.
